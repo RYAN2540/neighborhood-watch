@@ -1,0 +1,7 @@
+Hello {{name}}
+
+Thank you for creating a Neighborhood Watch account. As an admin, you're responsible for creating your neighbourhood and adding occupants. 
+
+Welcome!
+
+Neighborhood Watch Management (2021)

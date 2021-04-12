@@ -8,27 +8,49 @@ from django.contrib.auth.models import User
 from .models import Neighbourhood, Admin, Occupant, Business, Amenity, Post
 from django.contrib.auth.decorators import login_required
 from .email import send_signup_email_admin, send_signup_email_resident
-from .forms import AdminProfileForm, NeighbourhoodForm, AddResidentForm
-
-def home(request):
-    return render(request, 'home.html')
+from .forms import AdminProfileForm, NeighbourhoodForm, AddResidentForm, PostForm, BusinessForm, AmenityForm, ChangePasswordForm
+from django.contrib.auth import authenticate
+from django.contrib import messages
 
 @login_required(login_url='/accounts/login/')
-def email(request):
+def index(request):
+    current_user = request.user
+    admin= None
+    try:
+        admin = Admin.objects.get(user = current_user)
+    except Admin.DoesNotExist:
+        pass
+
+    occupant = None
+    try:
+        occupant = Occupant.objects.get(user = current_user)
+    except Occupant.DoesNotExist:
+        pass
+
+    if admin:
+        return redirect(admin)
+    elif occupant:
+        return redirect(user_profile)
+    else:
+        raise Http404
+
+@login_required(login_url='/accounts/login/')
+def send_email(request):
     current_user = request.user
     email = current_user.email
     name = current_user.username
     send_signup_email_admin(name, email)
-    return redirect(create_profile_admin)
+    return redirect(create_admin)
+
 
 @login_required(login_url='/accounts/login/')
-def create_profile_admin(request):
+def create_admin(request):
     current_user = request.user
     if request.method == 'POST':
         form = AdminProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.this_user = current_user
+            profile.user = current_user
             profile.save()
         return redirect(create_hood)
 
@@ -36,33 +58,33 @@ def create_profile_admin(request):
         form = AdminProfileForm()
 
     title = "Admin profile "
-    return render(request, 'profile_admin.html', {"form": form, "title": title})
+    return render(request, 'create-admin.html', {"form": form, "title": title})
 
 
 @login_required(login_url='/accounts/login/')
 def create_hood(request):
     current_user = request.user
     try:
-        admin_profile = Admin_Profile.objects.get(this_user = current_user)
-    except Admin_Profile.DoesNotExist:
+        admin = Admin.objects.get(user = current_user)
+    except Admin.DoesNotExist:
         raise Http404()
 
     my_hood = None
     try:
-        my_hood = Neighbourhood.objects.get(admin = admin_profile)
+        my_hood = Neighbourhood.objects.get(admin = admin)
     except Neighbourhood.DoesNotExist:
         pass
 
     if my_hood:
-        return redirect(my_admin_profile)
+        return redirect(my_admin)
 
     if request.method == 'POST':
         form = NeighbourhoodForm(request.POST)
         if form.is_valid():
             hood = form.save(commit=False)
-            hood.admin = admin_profile
+            hood.admin = admin
             hood.save()
-        return redirect(my_admin_profile)
+        return redirect(my_admin)
 
     else:
         form = NeighbourhoodForm()
@@ -72,16 +94,16 @@ def create_hood(request):
 
 
 @login_required(login_url='/accounts/login/')
-def my_admin_profile(request):
+def my_admin(request):
     current_user = request.user
     try:
-        admin_profile = Admin_Profile.objects.get(this_user = current_user)
-    except Admin_Profile.DoesNotExist:
+        admin = admin.objects.get(this_user = current_user)
+    except admin.DoesNotExist:
         raise Http404()
 
     my_hood =None
     try:
-        my_hood = Neighbourhood.objects.get(admin = admin_profile)
+        my_hood = Neighbourhood.objects.get(admin = admin)
     except Neighbourhood.DoesNotExist:
         raise Http404()
 
@@ -106,20 +128,20 @@ def my_admin_profile(request):
 
     map_page = m._repr_html_()    
 
-    title = admin_profile.this_user.username
-    return render(request, 'my-admin-profile.html', {"profile": admin_profile, "title": title, "hood": my_hood, "map_page":map_page})
+    title = admin.this_user.username
+    return render(request, 'my-admin-profile.html', {"profile": admin, "title": title, "hood": my_hood, "map_page":map_page})
 
 
 @login_required(login_url='/accounts/login/')
 def add_resident(request):
     current_user = request.user
     try:
-        admin_profile = Admin_Profile.objects.get(this_user = current_user)
-    except Admin_Profile.DoesNotExist:
+        admin = admin.objects.get(this_user = current_user)
+    except admin.DoesNotExist:
         raise Http404()
 
     try:
-        my_hood = Neighbourhood.objects.get(admin = admin_profile)
+        my_hood = Neighbourhood.objects.get(admin = admin)
     except Neighbourhood.DoesNotExist:
         raise Http404()
 
@@ -134,9 +156,9 @@ def add_resident(request):
             resident_profile = Resident_Profile(full_name=name, this_user=this_resident, username=username, hood=my_hood)
             resident_profile.save()
             my_hood.occupants_count = len(Resident_Profile.objects.filter(hood = my_hood))
-            send_signup_email_resident(name, username, password,admin_profile.full_name, my_hood.hood_name, email)
+            send_signup_email_resident(name, username, password,admin.full_name, my_hood.hood_name, email)
 
-        return redirect(my_admin_profile)
+        return redirect(my_admin)
 
     else:
         form = AddResidentForm()
@@ -149,12 +171,12 @@ def add_resident(request):
 def update_hood(request):
     current_user = request.user
     try:
-        admin_profile = Admin_Profile.objects.get(this_user = current_user)
-    except Admin_Profile.DoesNotExist:
+        admin = admin.objects.get(this_user = current_user)
+    except admin.DoesNotExist:
         raise Http404()
 
     try:
-        my_hood = Neighbourhood.objects.get(admin = admin_profile)
+        my_hood = Neighbourhood.objects.get(admin = admin)
     except Neighbourhood.DoesNotExist:
         pass
 
@@ -164,7 +186,7 @@ def update_hood(request):
             my_hood.hood_name = form.cleaned_data['hood_name']
             my_hood.location = form.cleaned_data['location']
             my_hood.save()
-        return redirect(my_admin_profile)
+        return redirect(my_admin)
 
     else:
         form = NeighbourhoodForm()
@@ -178,16 +200,16 @@ def update_hood(request):
 def delete_hood(request):
     current_user = request.user
     try:
-        admin_profile = Admin_Profile.objects.get(this_user = current_user)
-    except Admin_Profile.DoesNotExist:
+        admin = admin.objects.get(this_user = current_user)
+    except admin.DoesNotExist:
         raise Http404()
 
     try:
-        my_hood = Neighbourhood.objects.get(admin = admin_profile)
+        my_hood = Neighbourhood.objects.get(admin = admin)
     except Neighbourhood.DoesNotExist:
         pass
 
-    admin_profile.delete()
+    admin.delete()
     current_user.delete()
 
     return redirect(home)
