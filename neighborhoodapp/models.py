@@ -3,7 +3,7 @@ from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import User
 
 
-class Profile(models.Model):
+class Admin(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
 
     def __str__(self):
@@ -23,4 +23,21 @@ class Neighbourhood(models.Model):
     def delete_image(self):
         self.delete()
 
- 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    email = models.EmailField()
+    profile_pic = CloudinaryField('Profile Picture')
+
+    def __str__(self):
+        return self.user.username
+
+    def save_profile(self):
+        self.save()
+
+    def delete_profile(self):
+        self.delete()
+
+
+
+        
+         
