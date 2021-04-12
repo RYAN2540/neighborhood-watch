@@ -1,0 +1,5 @@
+.env
+virtual/
+*.pyc
+.vscode
+neighborhoodproject/settings.py
