@@ -19,4 +19,7 @@ from django.urls import path, re_path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^', include('neighborhoodapp.urls')),
+    re_path('^accounts/register/',
+        RegistrationView.as_view(success_url='/email'),
+        name='django_registration_register'),
 ]
