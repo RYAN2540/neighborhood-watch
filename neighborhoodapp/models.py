@@ -26,7 +26,6 @@ class Neighbourhood(models.Model):
     def __str__(self):
         return self.name
         
-
 class Business(models.Model):
     name = models.CharField(max_length = 80)
     category = models.CharField(max_length = 30)
