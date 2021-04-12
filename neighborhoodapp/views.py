@@ -163,7 +163,7 @@ def admin_profile(request):
 
     posts = Post.objects.filter(neighbourhood=my_hood) 
       
-    title = admin.user.username + " | MyNeighbourhood"
+    title = admin.user.username + " | Neighborhood Watch"
     return render(request, 'admin-profile.html', {"profile": admin, "title": title, "hood": my_hood, "map_page":map_page, "posts":posts})
 
 
@@ -334,7 +334,7 @@ def user_profile(request):
 
     posts = Post.objects.filter(neighbourhood=my_hood)
       
-    title = occupant.name + " | MyNeighbourhood"
+    title = occupant.name + " | Neighborhood Watch"
     return render(request, 'user-profile.html', {"profile": occupant, "title": title, "hood": my_hood, "map_page":map_page, "posts":posts})
 
 
