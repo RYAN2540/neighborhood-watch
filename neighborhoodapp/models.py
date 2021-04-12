@@ -52,7 +52,7 @@ AMENITY_CHOICES = (
 
 class Amenity(models.Model):
     name = models.CharField(max_length = 80)
-    category = models.CharField(max_length = 50, choices=AMENITY_CHOICES)
+    category = models.CharField(max_length=50, choices=AMENITY_CHOICES)
     location = models.CharField(max_length = 300)
     contact = models.CharField(max_length = 100)
     location = LocationField(map_attrs={"center": [36.82, -1.29], "marker_color": "blue"})

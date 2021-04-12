@@ -1,0 +1,1 @@
+web: gunicorn neighborhoodproject.wsgi --log-file -

@@ -20,7 +20,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    re_path(r'^admin/', admin.site.urls),
     re_path(r'^', include('neighborhoodapp.urls')),
     re_path('^accounts/register/',
         RegistrationView.as_view(success_url='/sendemail'),
