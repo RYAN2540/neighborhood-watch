@@ -16,7 +16,7 @@ The roles of the administrator involve: adding occupants, adding amenities and g
 </table>
 
 ## Live link
-Visit the application on  .
+Visit the application on  https://neighborhood-ryan.herokuapp.com/.
 
 ## Development
 To make advancements/modifications, follow these steps:
