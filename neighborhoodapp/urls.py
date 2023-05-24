@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    re_path(r'^$', views.index, name='index'),
     re_path(r'^sendemail/$', views.send_email, name='send-email'),
     re_path(r'^create-admin/$', views.create_admin, name='create-admin'),
     re_path(r'^create-hood/$', views.create_hood, name='create-hood'),
