@@ -20,11 +20,11 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
-    re_path(r'^admin/', admin.site.urls),
-    re_path(r'^', include('neighborhoodapp.urls')),
-    re_path('^accounts/register/',
-        RegistrationView.as_view(success_url='/sendemail'),
-        name='django_registration_register'),
+    path('admin/', admin.site.urls),
+    path('', include('neighborhoodapp.urls')),
+    re_path(r'^accounts/register/',
+            RegistrationView.as_view(success_url='/sendemail'),
+            name='django_registration_register'),
     re_path(r'^accounts/', include('django_registration.backends.one_step.urls')),
     re_path(r'^accounts/', include('django.contrib.auth.urls')),
     re_path(r'^logout/$', auth_views.LogoutView.as_view()),
